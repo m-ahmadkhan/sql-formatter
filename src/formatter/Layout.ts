@@ -90,6 +90,14 @@ export default class Layout {
         return item;
     }
   }
+
+  public lastItemsAfter(itemType: LayoutItem): LayoutItem[] {
+    const itemIdx = this.items.lastIndexOf(itemType);
+    if (itemIdx === -1) {
+      return [];
+    }
+    return this.items.slice(itemIdx + 1);
+  }
 }
 
 const isHorizontalWhitespace = (item: WS | string | undefined) =>

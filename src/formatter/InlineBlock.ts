@@ -1,6 +1,7 @@
 import { sum } from 'src/utils';
 import { isToken, type Token, TokenType } from 'src/lexer/token';
 import { BetweenPredicate, NodeType, Parenthesis } from 'src/parser/ast';
+import Layout, { WS } from './Layout';
 
 /**
  * Bookkeeper for inline blocks.
@@ -10,14 +11,28 @@ import { BetweenPredicate, NodeType, Parenthesis } from 'src/parser/ast';
  * expressions where open-parenthesis causes newline and increase of indentation.
  */
 export default class InlineBlock {
-  constructor(private expressionWidth: number) {}
+  constructor(private expressionWidth: number, private layout: Layout) {}
 
   /**
    * Check if this should be an inline parentheses block
    * Examples are "NOW()", "COUNT(*)", "int(10)", key(`somecolumn`), DECIMAL(7,2)
    */
   public isInlineBlock(parenthesis: Parenthesis): boolean {
-    return this.inlineWidth(parenthesis) <= this.expressionWidth;
+    const lineWidth = this.currentLineWidth();
+
+    if (lineWidth > this.expressionWidth && parenthesis.children.length !== 0) {
+      return false;
+    }
+    return lineWidth + this.inlineWidth(parenthesis) <= this.expressionWidth;
+  }
+
+  private currentLineWidth(): number {
+    return sum(
+      this.layout
+        .lastItemsAfter(WS.NEWLINE)
+        .filter((item): item is string => typeof item === 'string')
+        .map(item => item.length)
+    );
   }
 
   private inlineWidth(parenthesis: Parenthesis): number {

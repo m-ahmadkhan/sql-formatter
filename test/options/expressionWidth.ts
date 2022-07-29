@@ -37,15 +37,12 @@ export default function supportsExpressionWidth(format: FormatFn) {
   });
 
   it('keeps paranthesized expressions on single lines when they do not exceed expressionWidth', () => {
-    const result = format(
-      'SELECT product.price + (product.original_price * product.sales_tax) AS total FROM product;',
-      {
-        expressionWidth: 50,
-      }
-    );
+    const result = format('SELECT price + (original_price * sales_tax) AS total FROM product;', {
+      expressionWidth: 50,
+    });
     expect(result).toBe(dedent`
       SELECT
-        product.price + (product.original_price * product.sales_tax) AS total
+        price + (original_price * sales_tax) AS total
       FROM
         product;
     `);
@@ -68,6 +65,23 @@ export default function supportsExpressionWidth(format: FormatFn) {
       (
         amount>25
       );
+    `);
+  });
+
+  it('splits paranthesized expressions to multiple lines when previous line length + expression exceeds expressionWidth', () => {
+    const result = format(
+      'SELECT product.price + (product.original_price * product.sales_tax) AS total FROM product;',
+      {
+        expressionWidth: 50,
+      }
+    );
+    expect(result).toBe(dedent`
+      SELECT
+        product.price + (
+          product.original_price * product.sales_tax
+        ) AS total
+      FROM
+        product;
     `);
   });
 }

@@ -42,7 +42,7 @@ export default class ExpressionFormatter {
   constructor({ cfg, params, layout, inline = false }: ExpressionFormatterParams) {
     this.cfg = cfg;
     this.inline = inline;
-    this.inlineBlock = new InlineBlock(this.cfg.expressionWidth);
+    this.inlineBlock = new InlineBlock(this.cfg.expressionWidth, layout);
     this.params = params;
     this.layout = layout;
   }

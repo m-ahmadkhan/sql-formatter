@@ -109,7 +109,10 @@ describe('BigQueryFormatter', () => {
     );
     expect(result).toBe(dedent`
       SELECT
-        STRUCT ("Alpha" as name, [23.4, 26.3, 26.4, 26.1] as splits)
+        STRUCT (
+          "Alpha" as name,
+          [23.4, 26.3, 26.4, 26.1] as splits
+        )
       FROM
         beta
     `);
@@ -448,7 +451,10 @@ describe('BigQueryFormatter', () => {
           ${createExternalTable}
             dataset.CsvTable
           WITH PARTITION COLUMNS
-            (field_1 STRING, field_2 INT64) OPTIONS(format = 'CSV', uris = ['gs://bucket/path1.csv'])`;
+            (field_1 STRING, field_2 INT64) OPTIONS(
+              format = 'CSV',
+              uris = ['gs://bucket/path1.csv']
+            )`;
         expect(format(input)).toBe(expected);
       });
     });
@@ -461,7 +467,9 @@ describe('BigQueryFormatter', () => {
           AS (x * y);`;
         const expected = dedent`
           ${createFunction}
-            mydataset.myFunc (x FLOAT64, y FLOAT64) RETURNS FLOAT64 AS (x * y);`;
+            mydataset.myFunc (x FLOAT64, y FLOAT64) RETURNS FLOAT64 AS (
+              x * y
+            );`;
         expect(format(input)).toBe(expected);
 
         // Regression test for issue #309
@@ -669,7 +677,10 @@ describe('BigQueryFormatter', () => {
             mydataset.mytable
           SET OPTIONS
             (
-              expiration_timestamp = TIMESTAMP_ADD(CURRENT_TIMESTAMP(), INTERVAL 7 DAY)
+              expiration_timestamp = TIMESTAMP_ADD(
+                CURRENT_TIMESTAMP(),
+                INTERVAL 7 DAY
+              )
             )`;
         expect(format(input)).toBe(expected);
       });
@@ -788,7 +799,10 @@ describe('BigQueryFormatter', () => {
             mydataset.myview
           SET OPTIONS
             (
-              expiration_timestamp = TIMESTAMP_ADD(CURRENT_TIMESTAMP(), INTERVAL 7 DAY)
+              expiration_timestamp = TIMESTAMP_ADD(
+                CURRENT_TIMESTAMP(),
+                INTERVAL 7 DAY
+              )
             )`;
         expect(format(input)).toBe(expected);
       });

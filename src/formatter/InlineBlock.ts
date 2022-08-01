@@ -18,9 +18,12 @@ export default class InlineBlock {
    * Examples are "NOW()", "COUNT(*)", "int(10)", key(`somecolumn`), DECIMAL(7,2)
    */
   public isInlineBlock(parenthesis: Parenthesis): boolean {
-    const lineWidth = this.currentLineWidth();
+    if (parenthesis.children.length !== 0) {
+      return false;
+    }
 
-    if (lineWidth > this.expressionWidth && parenthesis.children.length !== 0) {
+    const lineWidth = this.currentLineWidth();
+    if (lineWidth > this.expressionWidth) {
       return false;
     }
     return lineWidth + this.inlineWidth(parenthesis) <= this.expressionWidth;
@@ -28,10 +31,20 @@ export default class InlineBlock {
 
   private currentLineWidth(): number {
     return sum(
-      this.layout
-        .lastItemsAfter(WS.NEWLINE)
-        .filter((item): item is string => typeof item === 'string')
-        .map(item => item.length)
+      this.layout.lastItemsAfter(WS.NEWLINE).map(item => {
+        if (typeof item === 'string') {
+          return item.length;
+        }
+
+        switch (item) {
+          case WS.SPACE:
+            return 1;
+          case WS.NEWLINE:
+          case WS.SINGLE_INDENT:
+            return 0;
+        }
+        return 0;
+      })
     );
   }
 
